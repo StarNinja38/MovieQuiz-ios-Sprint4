@@ -1,36 +1,16 @@
 import UIKit
 
-// MARK: - Models
-
-struct QuizQuestion {
-    let image: String
-    let text: String
-    let correctAnswer: Bool
-}
-
-struct QuizStepViewModel {
-    let image: UIImage
-    let question: String
-    let questionNumber: String
-}
-
-struct QuizResultsViewModel {
-    let title: String
-    let text: String
-    let buttonText: String
-}
-
 // MARK: - View Controller
 
 final class MovieQuizViewController: UIViewController {
 
     // MARK: - IBOutlets
 
-    @IBOutlet private var imageView: UIImageView!
-    @IBOutlet private var textLabel: UILabel!
-    @IBOutlet private var counterLabel: UILabel!
-    @IBOutlet private var noButton: UIButton!
-    @IBOutlet private var yesButton: UIButton!
+    @IBOutlet private weak var imageView: UIImageView!
+    @IBOutlet private weak var textLabel: UILabel!
+    @IBOutlet private weak var counterLabel: UILabel!
+    @IBOutlet private weak var noButton: UIButton!
+    @IBOutlet private weak var yesButton: UIButton!
 
     // MARK: - Private Properties
 
@@ -84,25 +64,37 @@ final class MovieQuizViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let currentQuestion = questions[currentQuestionIndex]
-        let viewModel = convert(model: currentQuestion)
-        show(quiz: viewModel)
+        showCurrentQuestion()
     }
 
     // MARK: - IBActions
 
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        let currentQuestion = questions[currentQuestionIndex]
-        showAnswerResult(isCorrect: currentQuestion.correctAnswer)
+        handleAnswer(true)
     }
 
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        let currentQuestion = questions[currentQuestionIndex]
-        showAnswerResult(isCorrect: !currentQuestion.correctAnswer)
+        handleAnswer(false)
     }
 
     // MARK: - Private Methods
+
+    private func showCurrentQuestion() {
+        let question = questions[currentQuestionIndex]
+        let viewModel = convert(model: question)
+        show(quiz: viewModel)
+    }
+
+    private func handleAnswer(_ userAnswer: Bool) {
+        let currentQuestion = questions[currentQuestionIndex]
+        let isCorrect = userAnswer == currentQuestion.correctAnswer
+        showAnswerResult(isCorrect: isCorrect)
+    }
+
+    private func setButtonsEnabled(_ isEnabled: Bool) {
+        noButton.isEnabled = isEnabled
+        yesButton.isEnabled = isEnabled
+    }
 
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         QuizStepViewModel(
@@ -118,8 +110,7 @@ final class MovieQuizViewController: UIViewController {
         counterLabel.text = step.questionNumber
         imageView.layer.borderWidth = 0
         imageView.layer.borderColor = UIColor.clear.cgColor
-        noButton.isEnabled = true
-        yesButton.isEnabled = true
+        setButtonsEnabled(true)
     }
 
     private func show(quiz result: QuizResultsViewModel) {
@@ -132,9 +123,7 @@ final class MovieQuizViewController: UIViewController {
             guard let self else { return }
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
-            let firstQuestion = self.questions[self.currentQuestionIndex]
-            let viewModel = self.convert(model: firstQuestion)
-            self.show(quiz: viewModel)
+            self.showCurrentQuestion()
         }
 
         alert.addAction(action)
@@ -146,8 +135,7 @@ final class MovieQuizViewController: UIViewController {
             correctAnswers += 1
         }
 
-        noButton.isEnabled = false
-        yesButton.isEnabled = false
+        setButtonsEnabled(false)
 
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
@@ -168,9 +156,7 @@ final class MovieQuizViewController: UIViewController {
             show(quiz: viewModel)
         } else {
             currentQuestionIndex += 1
-            let nextQuestion = questions[currentQuestionIndex]
-            let viewModel = convert(model: nextQuestion)
-            show(quiz: viewModel)
+            showCurrentQuestion()
         }
     }
 }
