@@ -204,10 +204,8 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question else { return }
         currentQuestion = question
-        let viewModel   = convert(model: question)
-        DispatchQueue.main.async { [weak self] in
-            self?.hideLoadingIndicator()
-            self?.show(quiz: viewModel)
-        }
+        let viewModel = convert(model: question)
+        hideLoadingIndicator()
+        show(quiz: viewModel)
     }
 }

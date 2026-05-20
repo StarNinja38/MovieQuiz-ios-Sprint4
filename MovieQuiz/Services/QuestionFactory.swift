@@ -66,7 +66,5 @@ final class QuestionFactory: QuestionFactoryProtocol {
         }
     }
 
-    func resetQuestions() {
-        // No-op: questions are fetched randomly from the loaded movies array
-    }
+    func resetQuestions() {}
 }
