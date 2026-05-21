@@ -23,7 +23,11 @@ final class MovieQuizViewController: UIViewController {
     private var alertPresenter: ResultAlertPresenter?
     private var statisticService: StatisticServiceProtocol?
 
-    private let activityIndicator = UIActivityIndicatorView(style: .large)
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
 
     // MARK: - Lifecycle
 
@@ -66,12 +70,10 @@ final class MovieQuizViewController: UIViewController {
     }
 
     private func showLoadingIndicator() {
-        activityIndicator.isHidden = false
         activityIndicator.startAnimating()
     }
 
     private func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
         activityIndicator.stopAnimating()
     }
 
@@ -106,7 +108,7 @@ final class MovieQuizViewController: UIViewController {
 
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
+            image: UIImage(data: model.imageData) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
         )

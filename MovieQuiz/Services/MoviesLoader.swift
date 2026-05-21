@@ -9,6 +9,7 @@ struct MoviesLoader: MoviesLoading {
     // MARK: - NetworkClient
 
     private let networkClient = NetworkClient()
+    private let decoder = JSONDecoder()
 
     // MARK: - URL
 
@@ -26,7 +27,11 @@ struct MoviesLoader: MoviesLoading {
             switch result {
             case .success(let data):
                 do {
-                    let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
+                    let mostPopularMovies = try decoder.decode(MostPopularMovies.self, from: data)
+                    guard mostPopularMovies.errorMessage.isEmpty else {
+                        handler(.failure(NetworkError.apiError(mostPopularMovies.errorMessage)))
+                        return
+                    }
                     handler(.success(mostPopularMovies))
                 } catch {
                     handler(.failure(error))
@@ -34,6 +39,19 @@ struct MoviesLoader: MoviesLoading {
             case .failure(let error):
                 handler(.failure(error))
             }
+        }
+    }
+}
+
+// MARK: - NetworkError
+
+private enum NetworkError: LocalizedError {
+    case apiError(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .apiError(let message):
+            return message
         }
     }
 }
