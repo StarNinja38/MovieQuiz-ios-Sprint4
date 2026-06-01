@@ -8,8 +8,12 @@ struct MoviesLoader: MoviesLoading {
 
     // MARK: - NetworkClient
 
-    private let networkClient = NetworkClient()
+    private let networkClient: NetworkRouting
     private let decoder = JSONDecoder()
+
+    init(networkClient: NetworkRouting = NetworkClient()) {
+        self.networkClient = networkClient
+    }
 
     // MARK: - URL
 
